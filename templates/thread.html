@@ -1,0 +1,20 @@
+<h1>  {{ thread[0][0] }}  </h1>
+<p>Keskustelun aloittaja: {{ thread[0][2] }}<br>
+Aloitettu: {{ thread[0][1].strftime("%Y-%m-%d %H:%M")}}</p>
+<hr>
+{% for message in messages %}
+
+{{ message[0] }}<br>
+Lähettäjä: {{ message[1]}} <br>
+Lähetetty: {{ message[2].strftime("%Y-%m-%d %H:%M") }}<br>
+
+<hr>
+{% endfor %}
+
+<form action="/postmsg" method="POST">
+    <p>viesti:<br>
+    <input type="text" name="message"></p>
+    <input type="hidden" name="thread_id" value="{{ thread[0][3] }}">
+    <input type="hidden" name="zone_id" value="{{ thread[0][4] }}">
+    <input type="submit" value="Lähetä">
+    </form>

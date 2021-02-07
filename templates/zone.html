@@ -1,0 +1,9 @@
+<h1>{{ zone[0][0] }}</h1>
+<p>{{ zone[0][1] }}</p>
+<hr>
+{% for thread in threads %}
+
+<a href="/forum/{{ thread [3] }}/{{ thread[0] }}", >{{ thread[2] }}</a><br>
+Luotu: {{ thread[4].strftime("%Y-%m-%d") }}
+<hr>
+{% endfor %}

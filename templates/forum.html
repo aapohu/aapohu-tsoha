@@ -1,0 +1,11 @@
+<h1>asd</h1>
+<p>Hei {{ session.username }}!</p>
+<hr>
+{% for zone in zones %}
+
+<a href="/forum/{{ zone [0] }}", >{{ zone[1] }}</a><br>
+{{ zone[2] }}<br>
+<hr>
+{% endfor %}
+
+<a href="/logout">Kirjaudu ulos</a>

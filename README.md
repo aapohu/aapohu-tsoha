@@ -1,6 +1,12 @@
 Tämä projekti on harjoitustyö [Tsoha](https://hy-tsoha.github.io/materiaali/index
 )-kurssille 
 
+Palautus 7.2.21:
+Tässä vaiheessa ei ole vielä koeajovalmista versiota herokussa. 
+Uusien käyttäjien rekisteröintitoiminnon toteuttamisessa tuli ongelmia joten varsinaisesti toimivia ominaisuuksia on vasta viestien lähettäminen olemassaoleviin keskusteluihin ja sisäänkirjautuminen valmiille käyttäjälle. 
+Sovellus on vielä yksittäinen app.py-tiedosto. Ensi viikolla on tarkoitus eriyttää sovelluksen toiminnot eri tiedostoihin. 
+
+
 Tavoitteena on tehdä keskustelusovellus/foorumi, jossa on seuraavat ominaisuudet:
    - Foorumilla on useita alueita
       - Alueilla on viestiketjuja, jotka koostuvat niihin lähetetyistä viesteistä

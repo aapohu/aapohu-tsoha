@@ -1,5 +1,4 @@
-from flask import Flask
-from flask import redirect, render_template, request, session
+from flask import Flask, redirect, render_template, request, session
 from os import getenv
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_sqlalchemy import SQLAlchemy
@@ -39,26 +38,42 @@ def login():
     session["username"] = username
     return redirect("/forum")
 
-# Broken method for creating new users
 
-# @app.route("/signup",methods=["POST"])
+@app.route("/registration")
+def registration():
+    return render_template("registration.html")
 
-# def signup():
-#     username = request.form["username"]
-#     password = request.form["password"]
+#method for handling registrations
+@app.route("/register",methods=["POST"])
+def register():
+    username = request.form["username"]
+    #check if username is taken
+    sql = "SELECT id FROM users WHERE username=:username"
+    result = db.session.execute(sql, {"username":username})
+    user = result.fetchone()
+    if user != None:
+        return "<p>Käyttäjätunnus on jo käytössä</p><br> <a href=\"/registration\">Yritä uudelleen</a>"
+    
+    #check if passwords match
+    password = request.form["password"]
+    password_again = request.form["password_again"]
+    if password != password_again:
+        return "<p>Salasanat eivät ole keskenään samat</p><br> <a href=\"/registration\">Yritä uudelleen</a>"
 
-#     hash_value = generate_password_hash(password)
-#     sql = "INSERT INTO users (username,password) VALUES (:username,:password)"
-#     db.session.execute(sql, {"username":username,"password":hash_value})
-#     db.session.commit()
+    #if previous checks pass the new user is added to the database
+    hash_value = generate_password_hash(password)
+    sql = "INSERT INTO users (username,password) VALUES (:username,:password)"
+    db.session.execute(sql, {"username":username,"password":hash_value})
+    db.session.commit()
+
+    return "<p>Käyttäjä rekisteröity onnistuneesti</p><br> <a href=\"/\">Kirjautumaan</a>"
+    
 
 
 @app.route("/logout")
 def logout():
     del session["username"]
     return redirect("/")
-
-
 
 
 #Main page for accessing discussion zones 
@@ -74,9 +89,9 @@ def zone(zone_id):
     sql = "SELECT * FROM threads WHERE zone_id =" + str(zone_id) 
     result = db.session.execute(sql)
     threads = result.fetchall()
-    sql = "SELECT name,description,id FROM zones WHERE id ="+ str(zone_id)
+    sql = "SELECT * FROM zones WHERE id ="+ str(zone_id)
     result = db.session.execute(sql)
-    zone_info = result.fetchall()
+    zone_info = result.fetchone()
     return render_template("zone.html", threads = threads, zone = zone_info)
 
 #Page for single thread
@@ -93,6 +108,31 @@ def thread(zone_id,thread_id):
     thread_info = result.fetchall()
 
     return render_template("thread.html", messages = messages, thread = thread_info)
+
+
+@app.route("/newthread", methods=["POST"])
+def newthread():
+    sql = "SELECT id FROM users WHERE username = '"+ session["username"] + "'"
+    result = db.session.execute(sql)
+    
+    user_id = result.fetchone()[0]
+    subject = request.form["subject"]
+    message = request.form["message"]
+    zone = request.form["zone_id"]
+    threadcreate = "INSERT INTO threads (started_by,subject,zone_id,created_at) VALUES (:user_id,:subject,:zone_id,NOW())"
+    firstpost = "INSERT INTO messages (poster_id,msg,thread_id,posted_at) VALUES (:user_id, :message, :thread_id, NOW())"
+    db.session.execute(threadcreate, {"user_id":user_id, "subject":subject, "zone_id":zone})
+    
+    result = db.session.execute("SELECT id FROM threads WHERE started_by = " + str(user_id) + " ORDER BY created_at DESC LIMIT 1")
+    thread_id = result.fetchone()[0]
+    db.session.execute(firstpost, {"user_id":user_id, "message":message, "thread_id":thread_id})
+    db.session.commit()
+
+    return redirect("/forum/"+ str(zone) +"/"+ str(thread_id))
+
+
+
+#function for posting messages in threads
 
 @app.route("/postmsg", methods=["POST"])
 def postmsg():

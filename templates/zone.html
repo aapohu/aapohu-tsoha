@@ -1,5 +1,5 @@
-<h1>{{ zone[0][0] }}</h1>
-<p>{{ zone[0][1] }}</p>
+<h1>{{ zone[1] }}</h1>
+<p>{{ zone[2] }}</p>
 <hr>
 {% for thread in threads %}
 
@@ -7,3 +7,11 @@
 Luotu: {{ thread[4].strftime("%Y-%m-%d") }}
 <hr>
 {% endfor %}
+
+<form action="/newthread" method="POST">
+    <p>Uusi keskustelu:<br>
+        Aihe:<input type="text" name="subject"><br>
+        Aloitusviesti:<input type="text" name="message"></p>
+    <input type="hidden" name="zone_id" value="{{ zone[0] }}">
+    <input type="submit" value="Lähetä">
+    </form>
